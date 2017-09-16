@@ -146,18 +146,16 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         if let anchor = anchor as? ARPlaneAnchor {
             os_log("got plane")
-            let plane = createPlane(anchor: anchor)
-            sceneView.scene.rootNode.addChildNode(plane)
+            let plane = Plane(anchor: anchor)
             planesByAnchorIdentifier[anchor.identifier] = plane
+            node.addChildNode(plane)
         }
     }
     
     func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
-        if let anchor = anchor as? ARPlaneAnchor, let plane = planesByAnchorIdentifier[anchor.identifier], let geometry = plane.geometry as? SCNPlane {
+        if let anchor = anchor as? ARPlaneAnchor, let plane = planesByAnchorIdentifier[anchor.identifier] as? Plane {
             os_log("updating plane")
-            geometry.width = CGFloat(anchor.extent.x)
-            geometry.height = CGFloat(anchor.extent.y)
-            plane.position = SCNVector3(anchor.center.x, 0, anchor.center.y)
+            plane.update(anchor: anchor)
         }
     }
     
@@ -165,18 +163,20 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         if let anchor = anchor as? ARPlaneAnchor, let plane = planesByAnchorIdentifier[anchor.identifier] {
             os_log("removing plane")
             plane.removeFromParentNode()
+            planesByAnchorIdentifier.removeValue(forKey: anchor.identifier)
         }
     }
     
-    func createPlane(anchor: ARPlaneAnchor) -> SCNNode {
-        let planeNode = SCNNode()
-        let geometry = SCNPlane(width: CGFloat(anchor.extent.x), height: CGFloat(anchor.extent.z))
-        geometry.firstMaterial?.diffuse.contents = UIColor.blue
-        
-        planeNode.geometry = geometry
-        planeNode.position = SCNVector3(anchor.center.x, 0, anchor.center.y)
-        planeNode.transform = SCNMatrix4MakeRotation(-Float.pi/2.0, 1.0, 0.0, 0.0)
-        planeNode.physicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
-        return planeNode
-    }
+//    Can be deleted if needed - X.W.
+//    func createPlane(anchor: ARPlaneAnchor) -> SCNNode {
+//        let planeNode = SCNNode()
+//        let geometry = SCNPlane(width: CGFloat(anchor.extent.x), height: CGFloat(anchor.extent.z))
+//        geometry.firstMaterial?.diffuse.contents = UIColor.blue
+//
+//        planeNode.geometry = geometry
+//        planeNode.position = SCNVector3(anchor.center.x, 0, anchor.center.y)
+//        planeNode.transform = SCNMatrix4MakeRotation(-Float.pi/2.0, 1.0, 0.0, 0.0)
+//        planeNode.physicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
+//        return planeNode
+//    }
 }
