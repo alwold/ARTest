@@ -147,7 +147,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         if let anchor = anchor as? ARPlaneAnchor {
             os_log("got plane")
             let plane = createPlane(anchor: anchor)
-            sceneView.scene.rootNode.addChildNode(plane)
+            node.addChildNode(plane)
             planesByAnchorIdentifier[anchor.identifier] = plane
         }
     }
@@ -156,8 +156,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         if let anchor = anchor as? ARPlaneAnchor, let plane = planesByAnchorIdentifier[anchor.identifier], let geometry = plane.geometry as? SCNPlane {
             os_log("updating plane")
             geometry.width = CGFloat(anchor.extent.x)
-            geometry.height = CGFloat(anchor.extent.y)
-            plane.position = SCNVector3(anchor.center.x, 0, anchor.center.y)
+            geometry.height = CGFloat(anchor.extent.z)
+            plane.position = SCNVector3(anchor.center.x, anchor.center.y, anchor.center.z)
         }
     }
     
@@ -169,14 +169,15 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     }
     
     func createPlane(anchor: ARPlaneAnchor) -> SCNNode {
-        let planeNode = SCNNode()
         let geometry = SCNPlane(width: CGFloat(anchor.extent.x), height: CGFloat(anchor.extent.z))
-        geometry.firstMaterial?.diffuse.contents = UIColor.blue
-        
-        planeNode.geometry = geometry
-        planeNode.position = SCNVector3(anchor.center.x, 0, anchor.center.y)
+        os_log("plane size: %f x %f", geometry.width, geometry.height)
+        geometry.firstMaterial!.diffuse.contents = UIColor.blue
+
+        let planeNode = SCNNode(geometry: geometry)
+        planeNode.position = SCNVector3(anchor.center.x, anchor.center.y, anchor.center.z)
+        os_log("position: %@", anchor.center.debugDescription)
         planeNode.transform = SCNMatrix4MakeRotation(-Float.pi/2.0, 1.0, 0.0, 0.0)
-        planeNode.physicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
+//        planeNode.physicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
         return planeNode
     }
 }
