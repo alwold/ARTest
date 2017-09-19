@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13189.4" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BV1-FR-VrT">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BV1-FR-VrT">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13165.3"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -27,20 +27,38 @@
                                     <action selector="buttonPressed:" destination="BV1-FR-VrT" eventType="touchUpInside" id="30T-Am-8YN"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Oo0-7e-Blc">
+                                <rect key="frame" x="166" y="20" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="r7l-r9-8Jl">
+                                <rect key="frame" x="323" y="636" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="Oo0-7e-Blc" firstAttribute="centerX" secondItem="Uti-hf-Ov1" secondAttribute="centerX" id="ELc-f3-JEa"/>
                             <constraint firstItem="86X-wF-Ond" firstAttribute="centerX" secondItem="8hc-b8-WOa" secondAttribute="centerX" id="FYx-m6-uOI"/>
                             <constraint firstItem="t4b-pN-Vrc" firstAttribute="top" secondItem="Uti-hf-Ov1" secondAttribute="top" id="TR9-WP-Izg"/>
                             <constraint firstItem="8hc-b8-WOa" firstAttribute="bottom" secondItem="86X-wF-Ond" secondAttribute="bottom" constant="20" id="VkV-yB-QP4"/>
                             <constraint firstItem="8hc-b8-WOa" firstAttribute="trailing" secondItem="t4b-pN-Vrc" secondAttribute="trailing" id="XSW-Sp-Zp7"/>
+                            <constraint firstItem="8hc-b8-WOa" firstAttribute="trailing" secondItem="r7l-r9-8Jl" secondAttribute="trailing" constant="10" id="d1T-Qj-99S"/>
                             <constraint firstItem="t4b-pN-Vrc" firstAttribute="leading" secondItem="8hc-b8-WOa" secondAttribute="leading" id="dzQ-4H-vGl"/>
+                            <constraint firstItem="Oo0-7e-Blc" firstAttribute="top" secondItem="8hc-b8-WOa" secondAttribute="top" id="eA9-dJ-qgx"/>
                             <constraint firstItem="86X-wF-Ond" firstAttribute="top" secondItem="t4b-pN-Vrc" secondAttribute="bottom" constant="8" symbolic="YES" id="enY-ad-9K6"/>
+                            <constraint firstItem="8hc-b8-WOa" firstAttribute="bottom" secondItem="r7l-r9-8Jl" secondAttribute="bottom" constant="10" id="zEe-nU-H9c"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="8hc-b8-WOa"/>
                     </view>
                     <connections>
                         <outlet property="sceneView" destination="t4b-pN-Vrc" id="Q0v-xB-Hdd"/>
+                        <outlet property="statsLabel" destination="r7l-r9-8Jl" id="Nec-kH-EBS"/>
+                        <outlet property="statusLabel" destination="Oo0-7e-Blc" id="jwo-9W-6BF"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>

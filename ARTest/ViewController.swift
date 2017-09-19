@@ -14,6 +14,9 @@ import os.log
 class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
+    @IBOutlet weak var statusLabel: UILabel!
+    @IBOutlet weak var statsLabel: UILabel!
+    
     var scene: SCNScene!
     var spotlight: SCNLight!
     var planesByAnchorIdentifier = [UUID: SCNNode]()
@@ -42,6 +45,12 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         addSpotlight(node: scene.rootNode)
         
         printLightInfo(node: scene.rootNode)
+        statusLabel.isHidden = true
+        statusLabel.backgroundColor = .white
+        statusLabel.layer.borderColor = UIColor.black.cgColor
+        statusLabel.layer.borderWidth = 2
+        statusLabel.layer.cornerRadius = 3
+        updateStats()
     }
     
     func printLightInfo(node: SCNNode) {
@@ -149,6 +158,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
             let plane = createPlane(anchor: anchor)
             node.addChildNode(plane)
             planesByAnchorIdentifier[anchor.identifier] = plane
+            showStatusText(text: "Added plane")
+            updateStats()
         }
     }
     
@@ -165,6 +176,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         if let anchor = anchor as? ARPlaneAnchor, let plane = planesByAnchorIdentifier[anchor.identifier] {
             os_log("removing plane")
             plane.removeFromParentNode()
+            planesByAnchorIdentifier.removeValue(forKey: anchor.identifier)
+            updateStats()
         }
     }
     
@@ -179,5 +192,21 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         planeNode.transform = SCNMatrix4MakeRotation(-Float.pi/2.0, 1.0, 0.0, 0.0)
 //        planeNode.physicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
         return planeNode
+    }
+    
+    func showStatusText(text: String) {
+        DispatchQueue.main.async {
+            self.statusLabel.isHidden = false
+            self.statusLabel.text = text
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5)) {
+                self.statusLabel.isHidden = true
+            }
+        }
+    }
+    
+    func updateStats() {
+        DispatchQueue.main.async {
+            self.statsLabel.text = "\(self.planesByAnchorIdentifier.count) planes"
+        }
     }
 }
