@@ -190,8 +190,9 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         planeNode.position = SCNVector3(anchor.center.x, anchor.center.y, anchor.center.z)
         os_log("position: %@", anchor.center.debugDescription)
         planeNode.transform = SCNMatrix4MakeRotation(-Float.pi/2.0, 1.0, 0.0, 0.0)
-//        planeNode.physicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
+        planeNode.physicsBody = SCNPhysicsBody(type: .kinematic, shape: nil)
         return planeNode
+        
     }
     
     func showStatusText(text: String) {
