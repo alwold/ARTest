@@ -75,7 +75,7 @@ class Plane: SCNNode {
             if isGiant {
                 plane.firstMaterial!.diffuse.contents = UIColor(red: 1, green: 0, blue: 0, alpha: 0.6)
             } else {
-                plane.firstMaterial!.diffuse.contents = UIColor(red: 1, green: 0, blue: 0, alpha: 0.6)
+                plane.firstMaterial!.diffuse.contents = UIColor(white: 0.6, alpha: 0.3)
             }
         } else {
             plane.firstMaterial!.diffuse.contents = UIColor(white: 1.0, alpha: 0.0)

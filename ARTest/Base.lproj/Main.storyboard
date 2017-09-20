@@ -39,14 +39,25 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OPN-as-ie8">
+                                <rect key="frame" x="10" y="627" width="57" height="30"/>
+                                <state key="normal" title="Settings"/>
+                                <connections>
+                                    <segue destination="SJl-ML-P4T" kind="popoverPresentation" popoverAnchorView="OPN-as-ie8" id="wxv-f0-5YV">
+                                        <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                                    </segue>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="OPN-as-ie8" firstAttribute="leading" secondItem="8hc-b8-WOa" secondAttribute="leading" constant="10" id="8K6-AM-vxp"/>
                             <constraint firstItem="Oo0-7e-Blc" firstAttribute="centerX" secondItem="Uti-hf-Ov1" secondAttribute="centerX" id="ELc-f3-JEa"/>
                             <constraint firstItem="86X-wF-Ond" firstAttribute="centerX" secondItem="8hc-b8-WOa" secondAttribute="centerX" id="FYx-m6-uOI"/>
                             <constraint firstItem="t4b-pN-Vrc" firstAttribute="top" secondItem="Uti-hf-Ov1" secondAttribute="top" id="TR9-WP-Izg"/>
                             <constraint firstItem="8hc-b8-WOa" firstAttribute="bottom" secondItem="86X-wF-Ond" secondAttribute="bottom" constant="20" id="VkV-yB-QP4"/>
                             <constraint firstItem="8hc-b8-WOa" firstAttribute="trailing" secondItem="t4b-pN-Vrc" secondAttribute="trailing" id="XSW-Sp-Zp7"/>
+                            <constraint firstItem="8hc-b8-WOa" firstAttribute="bottom" secondItem="OPN-as-ie8" secondAttribute="bottom" constant="10" id="Yly-3Z-6r3"/>
                             <constraint firstItem="8hc-b8-WOa" firstAttribute="trailing" secondItem="r7l-r9-8Jl" secondAttribute="trailing" constant="10" id="d1T-Qj-99S"/>
                             <constraint firstItem="t4b-pN-Vrc" firstAttribute="leading" secondItem="8hc-b8-WOa" secondAttribute="leading" id="dzQ-4H-vGl"/>
                             <constraint firstItem="Oo0-7e-Blc" firstAttribute="top" secondItem="8hc-b8-WOa" secondAttribute="top" id="eA9-dJ-qgx"/>
@@ -64,6 +75,46 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="101.59999999999999" y="38.23088455772114"/>
+        </scene>
+        <!--Settings View Controller-->
+        <scene sceneID="vTM-KP-XLW">
+            <objects>
+                <viewController id="SJl-ML-P4T" customClass="SettingsViewController" customModule="ARTest" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="bSB-LJ-qKo">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Moo-xP-Zn3">
+                                <rect key="frame" x="10" y="30" width="51" height="31"/>
+                                <connections>
+                                    <action selector="showPlanesTapped:" destination="SJl-ML-P4T" eventType="valueChanged" id="yrn-e9-f6X"/>
+                                </connections>
+                            </switch>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Show Planes" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="H7W-vb-j8O">
+                                <rect key="frame" x="67" y="35" width="298" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="H7W-vb-j8O" firstAttribute="leading" secondItem="Moo-xP-Zn3" secondAttribute="trailing" constant="8" symbolic="YES" id="ASn-n2-NJS"/>
+                            <constraint firstItem="H7W-vb-j8O" firstAttribute="centerY" secondItem="Moo-xP-Zn3" secondAttribute="centerY" id="DvQ-zL-orh"/>
+                            <constraint firstItem="7jJ-7A-EDm" firstAttribute="trailing" secondItem="H7W-vb-j8O" secondAttribute="trailing" constant="10" id="KBM-0R-ami"/>
+                            <constraint firstItem="Moo-xP-Zn3" firstAttribute="top" secondItem="7jJ-7A-EDm" secondAttribute="top" constant="10" id="Pjb-en-R6b"/>
+                            <constraint firstItem="Moo-xP-Zn3" firstAttribute="leading" secondItem="7jJ-7A-EDm" secondAttribute="leading" constant="10" id="pkm-Pn-LmW"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="7jJ-7A-EDm"/>
+                    </view>
+                    <value key="contentSizeForViewInPopover" type="size" width="375" height="200"/>
+                    <connections>
+                        <outlet property="showPlanesSwitch" destination="Moo-xP-Zn3" id="sRH-Qd-C0N"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="vaG-nH-sgz" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-844" y="749"/>
         </scene>
         <!--Scene Kit View Controller-->
         <scene sceneID="KH1-so-wgZ">

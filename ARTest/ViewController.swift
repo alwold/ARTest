@@ -11,7 +11,7 @@ import SceneKit
 import ARKit
 import os.log
 
-class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
+class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate, SettingsDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var statusLabel: UILabel!
@@ -20,6 +20,13 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     var scene: SCNScene!
     var spotlight: SCNLight!
     var planesByAnchorIdentifier = [UUID: Plane]()
+    var showPlanes = false {
+        didSet {
+            for plane in planesByAnchorIdentifier.values {
+                plane.visible = showPlanes
+            }
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -230,6 +237,13 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
 //                os_log("setting plane to not giant: %@", plane)
                 plane.isGiant = false
             }
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let settingsViewController = segue.destination as? SettingsViewController {
+            settingsViewController.delegate = self
+            settingsViewController.showPlanes = showPlanes
         }
     }
 }
