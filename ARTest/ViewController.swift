@@ -11,12 +11,22 @@ import SceneKit
 import ARKit
 import os.log
 
-class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
+class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate, SettingsDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
+    @IBOutlet weak var statusLabel: UILabel!
+    @IBOutlet weak var statsLabel: UILabel!
+    
     var scene: SCNScene!
     var spotlight: SCNLight!
-    var planesByAnchorIdentifier = [UUID: SCNNode]()
+    var planesByAnchorIdentifier = [UUID: Plane]()
+    var showPlanes = false {
+        didSet {
+            for plane in planesByAnchorIdentifier.values {
+                plane.visible = showPlanes
+            }
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,19 +41,27 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
 //        let scene = SCNScene(named: "art.scnassets/ship.scn")!
 
         scene = SCNScene()
-        sceneView.autoenablesDefaultLighting = false
-        sceneView.automaticallyUpdatesLighting = false
-        sceneView.debugOptions = [ARSCNDebugOptions.showWorldOrigin, ARSCNDebugOptions.showFeaturePoints]
+        sceneView.autoenablesDefaultLighting = true
+//        sceneView.automaticallyUpdatesLighting = false
+        sceneView.debugOptions = [/*ARSCNDebugOptions.showWorldOrigin,*/ ARSCNDebugOptions.showFeaturePoints]
 //        let scene = createSampleScene()
         
         // Set the scene to the view
         sceneView.scene = scene
         
-        addSpotlight(node: scene.rootNode)
+//        addSpotlight(node: scene.rootNode)
         
         printLightInfo(node: scene.rootNode)
         
         setupFocusSquare()
+//        addFakeFloorPlane()
+        
+        statusLabel.isHidden = true
+        statusLabel.backgroundColor = .white
+        statusLabel.layer.borderColor = UIColor.black.cgColor
+        statusLabel.layer.borderWidth = 2
+        statusLabel.layer.cornerRadius = 3
+        updateStats()
     }
     
     func printLightInfo(node: SCNNode) {
@@ -58,6 +76,16 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     
     @IBAction func buttonPressed(_ sender: Any) {
         addBall()
+    }
+    
+    func addFakeFloorPlane() {
+        let plane = SCNBox(width: 10, height: 0.01, length: 10, chamferRadius: 0.0)
+        plane.firstMaterial!.diffuse.contents = UIColor(red: 0, green: 1, blue: 0, alpha: 0.5)
+        let planeNode = SCNNode(geometry: plane)
+        planeNode.position = SCNVector3(0, -2, 0)
+//        planeNode.transform = SCNMatrix4MakeRotation(-Float.pi/2.0, 1.0, 0.0, 0.0)
+        planeNode.physicsBody = SCNPhysicsBody(type: .kinematic, shape: nil)
+        sceneView.scene.rootNode.addChildNode(planeNode)
     }
     
     func addSpotlight(node: SCNNode) {
@@ -144,7 +172,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         if let lightEstimate = frame.lightEstimate {
 //            os_log("got light estimate: %@", lightEstimate)
-            spotlight.intensity = lightEstimate.ambientIntensity
+//            spotlight.intensity = lightEstimate.ambientIntensity
 //            os_log("set intensity to %f", spotlight.intensity)
         }
     }
@@ -152,18 +180,19 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         if let anchor = anchor as? ARPlaneAnchor {
             os_log("got plane")
-            let plane = createPlane(anchor: anchor)
-            sceneView.scene.rootNode.addChildNode(plane)
+            let plane = Plane(anchor: anchor)
+            node.addChildNode(plane)
             planesByAnchorIdentifier[anchor.identifier] = plane
+            showStatusText(text: "Added plane")
+            updateStats()
+            extendLowestPlane()
         }
     }
     
     func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
-        if let anchor = anchor as? ARPlaneAnchor, let plane = planesByAnchorIdentifier[anchor.identifier], let geometry = plane.geometry as? SCNPlane {
-            os_log("updating plane")
-            geometry.width = CGFloat(anchor.extent.x)
-            geometry.height = CGFloat(anchor.extent.y)
-            plane.position = SCNVector3(anchor.center.x, 0, anchor.center.y)
+        if let anchor = anchor as? ARPlaneAnchor, let plane = planesByAnchorIdentifier[anchor.identifier] {
+            plane.update(anchor: anchor)
+            extendLowestPlane()
         }
     }
     
@@ -171,19 +200,56 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         if let anchor = anchor as? ARPlaneAnchor, let plane = planesByAnchorIdentifier[anchor.identifier] {
             os_log("removing plane")
             plane.removeFromParentNode()
+            planesByAnchorIdentifier.removeValue(forKey: anchor.identifier)
+            updateStats()
         }
     }
     
-    func createPlane(anchor: ARPlaneAnchor) -> SCNNode {
-        let planeNode = SCNNode()
-        let geometry = SCNPlane(width: CGFloat(anchor.extent.x), height: CGFloat(anchor.extent.z))
-        geometry.firstMaterial?.diffuse.contents = UIColor.blue
-        
-        planeNode.geometry = geometry
-        planeNode.position = SCNVector3(anchor.center.x, 0, anchor.center.y)
-        planeNode.transform = SCNMatrix4MakeRotation(-Float.pi/2.0, 1.0, 0.0, 0.0)
-        planeNode.physicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
-        return planeNode
+    func showStatusText(text: String) {
+        DispatchQueue.main.async {
+            self.statusLabel.isHidden = false
+            self.statusLabel.text = text
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5)) {
+                self.statusLabel.isHidden = true
+            }
+        }
+    }
+    
+    func updateStats() {
+        DispatchQueue.main.async {
+            self.statsLabel.text = "\(self.planesByAnchorIdentifier.count) planes"
+        }
+    }
+    
+    func extendLowestPlane() {
+        var lowestY = Float.infinity
+        var lowestPlane: Plane?
+        for plane in planesByAnchorIdentifier.values {
+            let parentY = plane.parent!.position.y // get the Y position of the plane anchor node added by ARKit
+            let translateY = plane.position.y
+            let actualY = parentY + translateY
+            if actualY < lowestY {
+                lowestPlane = plane
+                lowestY = actualY
+            }
+        }
+        if let lowestPlane = lowestPlane {
+            os_log("setting plane to giant: %@", lowestPlane)
+            lowestPlane.isGiant = true
+        }
+        for plane in planesByAnchorIdentifier.values {
+            if plane !== lowestPlane {
+//                os_log("setting plane to not giant: %@", plane)
+                plane.isGiant = false
+            }
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let settingsViewController = segue.destination as? SettingsViewController {
+            settingsViewController.delegate = self
+            settingsViewController.showPlanes = showPlanes
+        }
     }
     
     // MARK: Focus indicator
