@@ -41,15 +41,15 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate, Se
 //        let scene = SCNScene(named: "art.scnassets/ship.scn")!
 
         scene = SCNScene()
-        sceneView.autoenablesDefaultLighting = false
-        sceneView.automaticallyUpdatesLighting = false
-        sceneView.debugOptions = [ARSCNDebugOptions.showWorldOrigin, ARSCNDebugOptions.showFeaturePoints]
+        sceneView.autoenablesDefaultLighting = true
+//        sceneView.automaticallyUpdatesLighting = false
+        sceneView.debugOptions = [/*ARSCNDebugOptions.showWorldOrigin,*/ ARSCNDebugOptions.showFeaturePoints]
 //        let scene = createSampleScene()
         
         // Set the scene to the view
         sceneView.scene = scene
         
-        addSpotlight(node: scene.rootNode)
+//        addSpotlight(node: scene.rootNode)
         
         printLightInfo(node: scene.rootNode)
         
@@ -167,7 +167,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate, Se
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         if let lightEstimate = frame.lightEstimate {
 //            os_log("got light estimate: %@", lightEstimate)
-            spotlight.intensity = lightEstimate.ambientIntensity
+//            spotlight.intensity = lightEstimate.ambientIntensity
 //            os_log("set intensity to %f", spotlight.intensity)
         }
     }
