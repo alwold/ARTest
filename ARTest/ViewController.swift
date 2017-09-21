@@ -62,6 +62,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate, Se
         statusLabel.layer.borderWidth = 2
         statusLabel.layer.cornerRadius = 3
         updateStats()
+        setupRecognizers()
     }
     
     func printLightInfo(node: SCNNode) {
@@ -102,11 +103,11 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate, Se
         node.addChildNode(lightNode)
     }
     
-    func addBall() {
+    func addBall(position: SCNVector3 = SCNVector3(0, 0, -0.5), color: UIColor = UIColor.red) {
         let ballGeometry = SCNSphere(radius: 0.1)
-        ballGeometry.firstMaterial!.diffuse.contents = UIColor.red
+        ballGeometry.firstMaterial!.diffuse.contents = color
         let ballNode = SCNNode(geometry: ballGeometry)
-        ballNode.position = SCNVector3(0, 0, -0.5)
+        ballNode.position = position
         ballNode.physicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
 //        os_log("number of materials: %d", ballNode.geometry!.materials.count)
 //        if let material = ballNode.geometry?.firstMaterial {
@@ -252,6 +253,53 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate, Se
         }
     }
     
+    // MARK: - Tap to drop ball
+    func setupRecognizers() {
+        // Single tap will insert a new piece of geometry into the scene
+        let tap = UITapGestureRecognizer(target: self, action: #selector(viewTapped(sender:)))
+        tap.numberOfTapsRequired = 1
+        sceneView.addGestureRecognizer(tap)
+    }
+
+    @objc func viewTapped(sender: UITapGestureRecognizer) {
+        os_log("Tap!")
+        // Take the screen space tap coordinates and pass them to the hitTest method on the ARSCNView instance
+        let tapPoint = sender.location(in: sceneView)
+        
+        if let hitResult = sceneView.hitTest(tapPoint, types: .existingPlaneUsingExtent).first {
+            os_log("got arkit hit")
+            addBall(hitResult: hitResult)
+        } else {
+            let hitResult = sceneView.hitTest(tapPoint, options: nil)
+            if !hitResult.isEmpty {
+                os_log("got scenekit hits")
+                var position = hitResult.first!.worldCoordinates
+                position.y += 0.5
+                addBall(hitPosition: position)
+            } else {
+                os_log("no hits")
+            }
+        }
+    }
+    
+    func addBall(hitResult: ARHitTestResult) {
+        // We insert the geometry slightly above the point the user tapped, so that it drops onto the plane using the physics engine
+        let insertionYOffset: Float = 0.5
+        let position = SCNVector3Make(
+            hitResult.worldTransform.columns.3.x,
+            Float(hitResult.worldTransform.columns.3.y + insertionYOffset),
+            Float(hitResult.worldTransform.columns.3.z)
+        )
+        addBall(hitPosition: position)
+    }
+    
+    func addBall(hitPosition: SCNVector3) {
+        // We insert the geometry slightly above the point the user tapped, so that it drops onto the plane using the physics engine
+        let randomColor = UIColor(red: CGFloat(drand48()), green: CGFloat(drand48()), blue: CGFloat(drand48()), alpha: 1.0)
+
+        addBall(position: hitPosition, color: randomColor)
+    }
+
     // MARK: Focus indicator
     var screenCenter: CGPoint?
     var focusSquare: FocusSquare?
