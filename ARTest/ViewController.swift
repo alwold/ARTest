@@ -12,6 +12,7 @@ import ARKit
 import os.log
 
 class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate, SettingsDelegate {
+    let ballDropHeight: Float = 2.0
 
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var statusLabel: UILabel!
@@ -274,7 +275,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate, Se
             if !hitResult.isEmpty {
                 os_log("got scenekit hits")
                 var position = hitResult.first!.worldCoordinates
-                position.y += 0.5
+                position.y += ballDropHeight
                 addBall(hitPosition: position)
             } else {
                 os_log("no hits")
@@ -284,11 +285,10 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate, Se
     
     func addBall(hitResult: ARHitTestResult) {
         // We insert the geometry slightly above the point the user tapped, so that it drops onto the plane using the physics engine
-        let insertionYOffset: Float = 0.5
         let position = SCNVector3Make(
             hitResult.worldTransform.columns.3.x,
-            Float(hitResult.worldTransform.columns.3.y + insertionYOffset),
-            Float(hitResult.worldTransform.columns.3.z)
+            hitResult.worldTransform.columns.3.y + ballDropHeight,
+            hitResult.worldTransform.columns.3.z
         )
         addBall(hitPosition: position)
     }
